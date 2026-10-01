@@ -1,0 +1,674 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dammala Finance Helper</title>
+  <style>
+    :root{
+      --bg:#ffffff;
+      --card:#ffffff;
+      --accent:#0ea5e9;
+      --muted:#64748b;
+      --glass: rgba(14,165,233,0.03);
+      --msg-bg: rgba(14,165,233,0.08);
+    }
+    *{box-sizing:border-box}
+    body{
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 60%);
+      color:#0f172a;
+      padding:20px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .app {
+      width:100%;
+      max-width:1100px;
+      border-radius:16px;
+      padding:20px;
+      background: rgba(255,255,255,0.95);
+      box-shadow: 0 8px 30px rgba(14,165,233,0.15), 0 2px 8px rgba(0,0,0,0.05);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(14,165,233,0.1);
+    }
+
+    header {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:12px;
+    }
+    header h1{
+      margin:0;
+      font-size:20px;
+      letter-spacing:0.2px;
+    }
+    header p{margin:0;color:var(--muted);font-size:13px}
+
+    form.controls {
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+      gap:12px;
+      margin-bottom:10px;
+    }
+
+    .field {
+      display:flex;
+      flex-direction:column;
+    }
+    label {
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:6px;
+    }
+    input[type="number"], input[type="text"], input[type="tel"], textarea, select {
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid rgba(14,165,233,0.2);
+      background:#ffffff;
+      color:inherit;
+      outline:none;
+      font-size:14px;
+      min-height:44px;
+      font-family: inherit;
+      transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    textarea {
+      min-height:76px;
+      resize:vertical;
+    }
+    input[type="number"]:focus, input[type="text"]:focus, input[type="tel"]:focus, textarea:focus, select:focus {
+      border-color: #0ea5e9;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(14,165,233,0.1);
+    }
+
+    .options {
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .btn {
+      padding:10px 14px;
+      border-radius:10px;
+      border:none;
+      cursor:pointer;
+      font-weight:600;
+      font-size:14px;
+      min-height:44px;
+      transition: all 0.2s ease;
+    }
+    .btn:active {
+      transform: scale(0.98);
+    }
+    .btn.primary {
+      background:linear-gradient(90deg, #0ea5e9, #0284c7);
+      color:white;
+      box-shadow: 0 6px 18px rgba(14,165,233,0.25);
+    }
+    .btn.primary:hover {
+      background:linear-gradient(90deg, #38bdf8, #0ea5e9);
+    }
+    .btn.ghost {
+      background:#ffffff;
+      color:#64748b;
+      border:1px solid rgba(14,165,233,0.2);
+    }
+    .btn.ghost:hover {
+      background:rgba(14,165,233,0.05);
+      border-color: #0ea5e9;
+    }
+
+    .table-wrap {
+      margin-top:18px;
+      overflow:auto;
+      overflow-x:auto;
+      -webkit-overflow-scrolling: touch;
+      border-radius:12px;
+      padding:12px;
+      background: rgba(240,249,255,0.5);
+      border:1px solid rgba(14,165,233,0.15);
+    }
+
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0 8px;
+      min-width:820px;
+    }
+    thead th{
+      text-align:left;
+      font-size:13px;
+      padding:10px 12px;
+      color:var(--muted);
+      font-weight:600;
+      letter-spacing:0.2px;
+    }
+    tbody td{
+      background: #ffffff;
+      padding:12px;
+      font-size:14px;
+      border-top:1px solid rgba(14,165,233,0.08);
+      border-bottom:1px solid rgba(14,165,233,0.08);
+    }
+    tbody tr:hover td{
+      background: rgba(240,249,255,0.8);
+    }
+    tbody tr td:first-child { border-top-left-radius:8px; border-bottom-left-radius:8px;}
+    tbody tr td:last-child { border-top-right-radius:8px; border-bottom-right-radius:8px;}
+
+    .muted { color:var(--muted); font-size:13px; }
+
+    .small {
+      font-size:12px;
+      color:var(--muted);
+      margin-top:6px;
+    }
+
+    .msg {
+      margin-top:8px;
+      padding:10px 12px;
+      border-radius:10px;
+      background:var(--msg-bg);
+      color: #0c4a6e;
+      font-size:13px;
+      display:none;
+      border:1px solid rgba(14,165,233,0.25);
+    }
+
+    /* --- Customer Modal Dialog --- */
+    dialog#customerDialog {
+      width: 100%;
+      max-width: 480px;
+      border: 1px solid rgba(14,165,233,0.2);
+      border-radius: 16px;
+      padding: 24px;
+      background: #ffffff;
+      color: #0f172a;
+      box-shadow: 0 20px 50px rgba(15,23,42,0.2);
+    }
+    dialog#customerDialog::backdrop {
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(4px);
+    }
+    .modal-header {
+      margin-bottom: 16px;
+    }
+    .modal-header h2 {
+      margin: 0 0 4px 0;
+      font-size: 18px;
+    }
+    .modal-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .modal-grid .full-width {
+      grid-column: span 2;
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .customer-summary {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(240,249,255,0.7);
+      border: 1px solid rgba(14,165,233,0.2);
+      font-size: 13px;
+      display: none;
+    }
+    .customer-summary strong {
+      color: #0f172a;
+    }
+
+    /* --- Mobile-friendly responsive design --- */
+    @media (max-width:800px){
+      body { padding:16px; }
+      .app { padding:16px; }
+      
+      header { flex-direction:column; align-items:flex-start; gap:8px; }
+      header h1 { font-size:18px; }
+      header p { font-size:12px; }
+      
+      form.controls { 
+        grid-template-columns: 1fr;
+        gap:14px;
+      }
+      
+      .field.options { 
+        flex-direction:column; 
+        align-items:stretch; 
+        gap:10px;
+        grid-column: span 1 !important;
+      }
+      .field.options label { display:none; }
+      .field.options .btn { 
+        width:100%; 
+        padding:14px;
+        font-size:15px;
+      }
+      
+      input[type="number"], input[type="text"], input[type="tel"], textarea { 
+        font-size:16px; 
+        padding:14px 12px;
+      }
+      
+      label { font-size:13px; }
+      .small { font-size:12px; }
+      
+      .table-wrap { 
+        padding:6px; 
+        margin-left:-16px;
+        margin-right:-16px;
+        border-radius:0;
+      }
+      table { min-width:700px; } 
+      thead th, tbody td { padding:10px 8px; font-size:13px; }
+    }
+    
+    @media (max-width:600px){
+      body { padding:12px; }
+      .app { padding:12px; border-radius:12px; }
+      
+      header h1 { font-size:17px; }
+      .table-wrap { padding:4px; }
+      table { min-width:650px; }
+      thead th, tbody td { font-size:12px; padding:8px 6px; }
+      .modal-grid { grid-template-columns: 1fr; }
+      .modal-grid .full-width { grid-column: span 1; }
+    }
+    
+    @media (max-width:420px){
+      body { padding:8px; }
+      .app { padding:10px; border-radius:10px; }
+      
+      header h1 { font-size:16px; }
+      header p { font-size:11px; }
+      .small { font-size:11px; }
+      
+      form.controls { gap:12px; }
+      .field.options .btn { padding:12px; font-size:14px; }
+      
+      .table-wrap { padding:2px; }
+      table { min-width:580px; }
+      thead th { font-size:11px; padding:7px 4px; }
+      tbody td { font-size:11px; padding:7px 4px; }
+    }
+
+    .btn.secondary {
+      background: #f0f9ff;
+      color: #0284c7;
+      border: 1px solid rgba(14,165,233,0.35);
+    }
+    .btn.secondary:hover {
+      background: #e0f2fe;
+      border-color: #0ea5e9;
+    }
+
+    @media print {
+      body { background: #fff; padding: 0; display: block; }
+      .app { box-shadow: none; border: none; max-width: 100%; padding: 0; }
+      .field.options, #interestHint, .small, dialog { display: none !important; }
+      #note { display: block !important; margin-top: 12px; }
+      .table-wrap { overflow: visible; background: transparent; border: none; padding: 0; }
+      table { min-width: 100%; border-collapse: collapse; border-spacing: 0; }
+      thead th, tbody td { border: 1px solid #cbd5e1; padding: 8px 10px; }
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div>
+        <h1>Dammala Finance Helper</h1>
+        <p class="muted">Enter flexible values — table will show monthly interest, EMI (principal part) and totals.</p>
+      </div>
+      <div class="small">Made quick & simple ✨</div>
+    </header>
+
+    <form id="form" class="controls" onsubmit="return false;">
+      <div class="field">
+        <label>Total Amount</label>
+        <input id="totalAmount" type="number" step="0.01" value="20000" />
+      </div>
+
+      <div class="field">
+        <label>Monthly Interest Rate (%) — enter number directly (e.g., 1 for 1%, 2 for 2%)</label>
+        <input id="interestRate" type="number" step="0.01" value="6" />
+        <div id="interestHint" class="small">Enter the monthly interest rate as a number (e.g., 1 = 1% per month).</div>
+      </div>
+
+      <div class="field">
+        <label>Total Months</label>
+        <input id="months" type="number" step="1" value="8" />
+      </div>
+
+      <div class="field options" style="align-items:center;grid-column: span 3;">
+        <button id="generate" class="btn primary" style="margin-left:auto">Generate Table</button>
+        <button id="downloadPdf" class="btn secondary" type="button">Download PDF</button>
+        <button id="reset" class="btn ghost" type="button">Reset</button>
+      </div>
+    </form>
+
+    <div id="ruleMsg" class="msg" role="status" aria-live="polite"></div>
+
+    <div id="customerSummary" class="customer-summary"></div>
+
+    <div id="tableContainer" class="table-wrap" hidden>
+      <table id="resultTable" aria-live="polite">
+        <thead>
+          <tr>
+            <th>Month</th>
+            <th>Opening Balance</th>
+            <th>Monthly Interest (%)</th>
+            <th>Interest Amount</th>
+            <th>EMI (Principal)</th>
+            <th>Total Amount (EMI + Interest)</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div id="note" class="small" style="margin-top:8px;color:var(--muted);display:none"></div>
+  </div>
+
+  <!-- Customer Details Modal before PDF Download -->
+  <dialog id="customerDialog">
+    <form id="customerForm" method="dialog">
+      <div class="modal-header">
+        <h2>Customer Details</h2>
+        <p class="muted">Please enter customer details to include in the PDF.</p>
+      </div>
+
+      <div class="modal-grid">
+        <div class="field">
+          <label for="firstName">First Name *</label>
+          <input id="firstName" type="text" placeholder="Enter first name" required />
+        </div>
+
+        <div class="field">
+          <label for="lastName">Last Name *</label>
+          <input id="lastName" type="text" placeholder="Enter last name" required />
+        </div>
+
+        <div class="field full-width">
+          <label for="mobileNumber">Mobile Number *</label>
+          <input id="mobileNumber" type="tel" placeholder="Enter mobile number" required />
+        </div>
+
+        <div class="field full-width">
+          <label for="address">Address *</label>
+          <textarea id="address" placeholder="Enter full address" required></textarea>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="cancelModal" class="btn ghost" type="button">Cancel</button>
+        <button id="confirmDownload" class="btn primary" type="submit">Download PDF</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script>
+    const $ = sel => document.querySelector(sel);
+    const format = n => Number(n).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+
+    // helpers
+    function parseNumberFromInput(el) {
+      if (!el) return 0;
+      // remove commas/spaces and coerce to Number
+      const raw = String(el.value).replace(/,/g, '').trim();
+      const num = Number(raw);
+      return Number.isFinite(num) ? num : 0;
+    }
+    function setMsg(text, show = true) {
+      const el = $('#ruleMsg');
+      if (!text || !show) {
+        el.style.display = 'none';
+        el.textContent = '';
+      } else {
+        el.style.display = 'block';
+        el.textContent = text;
+      }
+    }
+
+    // track last active rule so we don't spam the same alerts repeatedly
+    let lastRule = null;
+
+    function applyRuleForTotal(totalVal, triggerAlert = true) {
+      // Flexible: no rules applied, all inputs are free
+      const rateEl = $('#interestRate');
+      rateEl.disabled = false;
+      setMsg('', false);
+      return {rule:'flexible'};
+    }
+
+    // called whenever the totalAmount changes or on load
+    function enforceInterestRules(triggerAlert = false) {
+      const totalVal = parseNumberFromInput($('#totalAmount'));
+      return applyRuleForTotal(totalVal, triggerAlert);
+    }
+
+    function computeAndRender() {
+      const total = parseNumberFromInput($('#totalAmount'));
+      const months = Math.max(1, parseInt($('#months').value || 0, 10));
+      // enforce rules first (and allow alerts to fire)
+      const rule = enforceInterestRules(true);
+
+      // read and validate interest after rule enforcement
+      const rateRaw = $('#interestRate').value;
+      const rateInput = Number(String(rateRaw).replace(/,/g,'').trim()) || 0;
+
+      if (total <= 0 || months <= 0) {
+        alert('Enter valid Total Amount and Months.');
+        return;
+      }
+
+      if (rateInput < 0) {
+        alert('Interest rate must be a positive number.');
+        return;
+      }
+
+      // principal per month
+      const principalPerMonth = total / months;
+      // interpret rateInput as monthly percent, compute monthly decimal
+      const monthlyPercentDecimal = rateInput / 100;
+
+      const tbody = $('#resultTable tbody');
+      tbody.innerHTML = '';
+      let opening = total;
+
+      for (let m = 1; m <= months; m++) {
+        const interestAmt = opening * monthlyPercentDecimal;
+        const totalForMonth = principalPerMonth + interestAmt;
+        const tr = document.createElement('tr');
+
+        tr.innerHTML = `
+          <td>${m}</td>
+          <td>${format(opening)}</td>
+          <td>${(monthlyPercentDecimal*100).toFixed(3)}%</td>
+          <td>${format(interestAmt)}</td>
+          <td>${format(principalPerMonth)}</td>
+          <td>${format(totalForMonth)}</td>
+        `;
+        tbody.appendChild(tr);
+
+        opening = opening - principalPerMonth;
+        if (opening < 0.00001) opening = 0;
+      }
+
+      $('#tableContainer').hidden = false;
+      $('#note').style.display = 'block';
+      $('#note').textContent = `Monthly interest rate: ${rateInput}% | EMI (principal): ${format(principalPerMonth)} per month.`;
+    }
+
+    function openCustomerModal() {
+      // Ensure table is up to date with current inputs before opening modal
+      computeAndRender();
+      if ($('#tableContainer').hidden) return;
+
+      const dialog = $('#customerDialog');
+      if (typeof dialog.showModal === 'function') {
+        dialog.showModal();
+      }
+    }
+
+    function generatePDFWithCustomer(customer) {
+      const total = parseNumberFromInput($('#totalAmount'));
+      const months = Math.max(1, parseInt($('#months').value || 0, 10));
+      const rateRaw = $('#interestRate').value;
+      const rateInput = Number(String(rateRaw).replace(/,/g, '').trim()) || 0;
+      const principalPerMonth = total / months;
+
+      const fullName = `${customer.firstName} ${customer.lastName}`.trim();
+
+      // Update on-page summary (also useful for print fallback)
+      const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+      const summaryEl = $('#customerSummary');
+      summaryEl.style.display = 'block';
+      summaryEl.innerHTML = `
+        <strong>Customer:</strong> ${esc(fullName)} &nbsp;|&nbsp;
+        <strong>Mobile:</strong> ${esc(customer.mobileNumber)} &nbsp;|&nbsp;
+        <strong>Address:</strong> ${esc(customer.address)}
+      `;
+
+      // Use jsPDF if loaded, otherwise fallback to browser print-to-PDF
+      if (window.jspdf && window.jspdf.jsPDF) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        // Title
+        doc.setFontSize(18);
+        doc.setTextColor(15, 23, 42);
+        doc.text('Loan Repayment Schedule', 14, 18);
+
+        // Customer Details Box
+        doc.setFillColor(240, 249, 255);
+        doc.setDrawColor(186, 230, 253);
+        const addressLines = doc.splitTextToSize(`Address: ${customer.address}`, 174);
+        const boxHeight = 20 + (addressLines.length * 5);
+        doc.roundedRect(14, 23, 182, boxHeight, 2, 2, 'FD');
+
+        doc.setFontSize(10);
+        doc.setTextColor(15, 23, 42);
+        doc.setFont(undefined, 'bold');
+        doc.text('Customer Details', 18, 30);
+
+        doc.setFont(undefined, 'normal');
+        doc.setFontSize(9.5);
+        doc.text(`First Name: ${customer.firstName}`, 18, 36);
+        doc.text(`Last Name: ${customer.lastName}`, 105, 36);
+        doc.text(`Mobile Number: ${customer.mobileNumber}`, 18, 42);
+        doc.text(addressLines, 18, 48);
+
+        // Loan Summary Line
+        const loanSummaryY = 23 + boxHeight + 7;
+        doc.setFontSize(10);
+        doc.setTextColor(100, 116, 139);
+        doc.text(
+          `Total Amount: ${format(total)}   |   Monthly Interest Rate: ${rateInput}%   |   Total Months: ${months}   |   EMI (Principal): ${format(principalPerMonth)}`,
+          14,
+          loanSummaryY
+        );
+
+        doc.autoTable({
+          html: '#resultTable',
+          startY: loanSummaryY + 5,
+          theme: 'grid',
+          headStyles: {
+            fillColor: [14, 165, 233],
+            textColor: 255,
+            fontStyle: 'bold',
+            fontSize: 9.5
+          },
+          bodyStyles: {
+            fontSize: 9,
+            textColor: [15, 23, 42]
+          },
+          alternateRowStyles: {
+            fillColor: [240, 249, 255]
+          }
+        });
+
+        const safeName = fullName.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'customer';
+        doc.save(`loan-schedule-${safeName}-${total}.pdf`);
+      } else {
+        window.print();
+      }
+    }
+
+    // events
+    document.getElementById('generate').addEventListener('click', computeAndRender);
+    document.getElementById('downloadPdf').addEventListener('click', openCustomerModal);
+
+    document.getElementById('cancelModal').addEventListener('click', () => {
+      $('#customerDialog').close();
+    });
+
+    document.getElementById('customerForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const customer = {
+        firstName: $('#firstName').value.trim(),
+        lastName: $('#lastName').value.trim(),
+        mobileNumber: $('#mobileNumber').value.trim(),
+        address: $('#address').value.trim()
+      };
+
+      if (!customer.firstName || !customer.lastName || !customer.mobileNumber || !customer.address) {
+        alert('Please fill in all customer details.');
+        return;
+      }
+
+      $('#customerDialog').close();
+      generatePDFWithCustomer(customer);
+    });
+
+    document.getElementById('reset').addEventListener('click', () => {
+      $('#totalAmount').value = 20000;
+      $('#interestRate').value = 6;
+      $('#months').value = 8;
+      $('#firstName').value = '';
+      $('#lastName').value = '';
+      $('#mobileNumber').value = '';
+      $('#address').value = '';
+      $('#customerSummary').style.display = 'none';
+      $('#customerSummary').innerHTML = '';
+      $('#tableContainer').hidden = true;
+      $('#note').style.display = 'none';
+      lastRule = null;
+      setMsg('', false);
+      enforceInterestRules(false);
+    });
+
+    // attach robust listeners
+    const totalInput = $('#totalAmount');
+    ['input','change','blur','paste'].forEach(e => totalInput.addEventListener(e, () => enforceInterestRules(e !== 'input')));
+
+    // No clamping needed - flexible input
+
+    // initial setup on load
+    window.addEventListener('load', () => {
+      enforceInterestRules(false);
+      computeAndRender();
+    });
+  </script>
+</body>
+</html>
